@@ -84,7 +84,8 @@ export default class EntryAbility extends UIAbility {
   }
 
   onBackground(): void {
-    hilog.info(0x0000, TAG, '>>> onBackground');
+    hilog.info(0x0000, TAG, '>>> onBackground, floatWindow state=%{public}s',
+      this.floatWindowManager.getState());
     this.floatWindowManager.showFloatWindow();
   }
 }

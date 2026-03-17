@@ -36,48 +36,44 @@ export class FloatWindowManager {
       return;
     }
     this.state = FloatWindowState.CREATING;
-    hilog.info(DOMAIN, TAG, '[create] step 1: creating window...');
+    hilog.info(DOMAIN, TAG, '[create] START');
 
     try {
-      const config: window.Configuration = {
+      // 最简创建：只做必要步骤
+      this.windowInstance = await window.createWindow({
         name: AppConstants.FLOAT_WINDOW_NAME,
         windowType: window.WindowType.TYPE_FLOAT,
         ctx: context
-      };
-      this.windowInstance = await window.createWindow(config);
-      hilog.info(DOMAIN, TAG, '[create] step 2: window created OK');
+      });
+      hilog.info(DOMAIN, TAG, '[create] window obj created');
 
-      const sizePx = ScreenUtils.vpToPx(AppConstants.FLOAT_WINDOW_SIZE);
-      await this.windowInstance.resize(sizePx, sizePx);
-      hilog.info(DOMAIN, TAG, '[create] step 3: resized to %{public}d', sizePx);
+      await this.windowInstance.resize(300, 300);
+      hilog.info(DOMAIN, TAG, '[create] resized');
 
-      const initX = ScreenUtils.getScreenWidthPx() - sizePx;
-      const initY = ScreenUtils.getScreenHeightPx() - sizePx;
-      await this.windowInstance.moveWindowTo(initX, initY);
-      this.currentPositionPx = { x: initX, y: initY };
-      hilog.info(DOMAIN, TAG, '[create] step 4: moved to (%{public}d, %{public}d)', initX, initY);
+      await this.windowInstance.moveWindowTo(100, 100);
+      hilog.info(DOMAIN, TAG, '[create] moved to 100,100');
 
-      await this.windowInstance.setWindowBackgroundColor('#00000000');
-      hilog.info(DOMAIN, TAG, '[create] step 5: bg color set');
-
-      hilog.info(DOMAIN, TAG, '[create] step 6: calling setUIContent...');
-      await this.windowInstance.setUIContent('pages/FloatTestPage');
-      hilog.info(DOMAIN, TAG, '[create] step 7: setUIContent OK');
-
-      await this.windowInstance.setWindowTouchable(true);
-      hilog.info(DOMAIN, TAG, '[create] step 8: touchable set');
+      // 用 callback 版本的 setUIContent 来捕获具体错误
+      this.windowInstance.setUIContent('pages/FloatTestPage', (err) => {
+        if (err && err.code) {
+          hilog.error(DOMAIN, TAG, '[create] setUIContent CALLBACK ERROR: code=%{public}d msg=%{public}s', err.code, err.message);
+        } else {
+          hilog.info(DOMAIN, TAG, '[create] setUIContent CALLBACK OK');
+        }
+      });
+      hilog.info(DOMAIN, TAG, '[create] setUIContent called (callback mode)');
 
       await this.windowInstance.showWindow();
-      hilog.info(DOMAIN, TAG, '[create] step 9: showWindow OK');
+      hilog.info(DOMAIN, TAG, '[create] showWindow done');
 
       this.appContext = context;
-      this.lastValidPositionPx = { x: initX, y: initY };
-      this.setupWindowEventListener();
+      this.currentPositionPx = { x: 100, y: 100 };
+      this.lastValidPositionPx = { x: 100, y: 100 };
       this.state = FloatWindowState.VISIBLE;
-      hilog.info(DOMAIN, TAG, '[create] DONE at (%{public}d, %{public}d)', initX, initY);
-    } catch (err) {
+      hilog.info(DOMAIN, TAG, '[create] ALL DONE');
+    } catch (err: Error) {
       this.state = FloatWindowState.HIDDEN;
-      hilog.error(DOMAIN, TAG, '[create] FAILED: %{public}s', JSON.stringify(err));
+      hilog.error(DOMAIN, TAG, '[create] CATCH: %{public}s', JSON.stringify(err));
     }
   }
 

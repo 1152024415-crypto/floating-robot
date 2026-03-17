@@ -2,7 +2,7 @@ import { AppConstants } from '../constants/AppConstants';
 
 @Component
 export struct DeleteZone {
-  @Prop isVisible: boolean = false;
+  @Prop @Watch('onVisibilityChange') isVisible: boolean = false;
   @Prop isHighlighted: boolean = false;
   @State private translateY: number = -AppConstants.DELETE_ZONE_HEIGHT;
 

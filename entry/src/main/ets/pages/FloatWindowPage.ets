@@ -1,4 +1,3 @@
-import { router } from '@kit.ArkUI';
 import { hilog } from '@kit.PerformanceAnalysisKit';
 import { common } from '@kit.AbilityKit';
 import { AppConstants } from '../constants/AppConstants';

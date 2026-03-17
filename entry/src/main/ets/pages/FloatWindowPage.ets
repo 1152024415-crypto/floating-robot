@@ -146,7 +146,7 @@ struct FloatWindowPage {
     this.floatWindowManager.hideFloatWindow();
     const context = getContext(this) as common.UIAbilityContext;
     context.startAbility({
-      bundleName: 'com.example.myapplication',
+      bundleName: 'com.xxy.airobot',
       abilityName: 'EntryAbility',
       parameters: { 'showMainPage': true }
     });

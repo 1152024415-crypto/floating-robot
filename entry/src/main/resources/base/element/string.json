@@ -1,0 +1,14 @@
+{
+  "string": [
+    { "name": "module_desc", "value": "悬浮AI助手模块" },
+    { "name": "EntryAbility_desc", "value": "悬浮AI助手机器人" },
+    { "name": "EntryAbility_label", "value": "AI助手" },
+    { "name": "float_window_reason", "value": "需要悬浮窗权限以显示AI助手机器人" },
+    { "name": "main_page_title", "value": "AI助手（开发中）" },
+    { "name": "delete_confirm_title", "value": "确定退出？" },
+    { "name": "delete_confirm_message", "value": "退出后悬浮助手将关闭" },
+    { "name": "confirm_button", "value": "确定" },
+    { "name": "cancel_button", "value": "取消" },
+    { "name": "message_confirm_bar", "value": "已读" }
+  ]
+}

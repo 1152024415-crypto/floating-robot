@@ -63,6 +63,7 @@ export class FloatWindowManager {
       await this.windowInstance.showWindow();
 
       this.appContext = context;
+      this.lastValidPositionPx = { x: initX, y: initY };
       this.setupWindowEventListener();
       this.state = FloatWindowState.VISIBLE;
       hilog.info(DOMAIN, TAG, 'Float window created at (%{public}d, %{public}d)', initX, initY);

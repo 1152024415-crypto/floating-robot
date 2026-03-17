@@ -27,7 +27,7 @@ export default class EntryAbility extends UIAbility {
     hilog.info(DOMAIN, 'testTag', 'Ability onDestroy');
   }
 
-  async onWindowStageCreate(windowStage: window.WindowStage): Promise<void> {
+  onWindowStageCreate(windowStage: window.WindowStage): void {
     hilog.info(DOMAIN, 'testTag', 'Ability onWindowStageCreate');
     this.windowStage = windowStage;
 
@@ -39,12 +39,19 @@ export default class EntryAbility extends UIAbility {
       hilog.info(DOMAIN, 'testTag', 'Content loaded');
     });
 
-    const granted = await PermissionHelper.requestFloatWindowPermission(this.context);
-    if (granted) {
-      await this.floatWindowManager.createFloatWindow(this.context);
-    } else {
-      hilog.warn(DOMAIN, 'testTag', 'Float window permission denied');
-    }
+    // 不能用 async/await，框架不会等待异步完成就继续生命周期
+    // 用 .then() 延迟创建悬浮窗
+    const context = this.context;
+    PermissionHelper.requestFloatWindowPermission(context).then((granted: boolean) => {
+      hilog.info(DOMAIN, 'testTag', 'Permission result: %{public}s', granted.toString());
+      if (granted) {
+        this.floatWindowManager.createFloatWindow(context).then(() => {
+          hilog.info(DOMAIN, 'testTag', 'Float window created successfully');
+        });
+      } else {
+        hilog.warn(DOMAIN, 'testTag', 'Float window permission denied');
+      }
+    });
   }
 
   onWindowStageDestroy(): void {

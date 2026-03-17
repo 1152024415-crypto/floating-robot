@@ -6,7 +6,7 @@ import { PermissionHelper } from '../utils/PermissionHelper';
 import { FloatWindowManager } from '../managers/FloatWindowManager';
 import { ScreenUtils } from '../utils/ScreenUtils';
 
-const DOMAIN = 0x0000;
+const TAG = 'FloatingBot';
 
 export default class EntryAbility extends UIAbility {
   private floatWindowManager: FloatWindowManager = FloatWindowManager.getInstance();
@@ -14,53 +14,62 @@ export default class EntryAbility extends UIAbility {
   private hasUserTappedRobot: boolean = false;
 
   onCreate(want: Want, launchParam: AbilityConstant.LaunchParam): void {
+    hilog.info(0x0000, TAG, '>>> onCreate start');
     try {
       this.context.getApplicationContext().setColorMode(ConfigurationConstant.ColorMode.COLOR_MODE_NOT_SET);
     } catch (err) {
-      hilog.error(DOMAIN, 'testTag', 'Failed to set colorMode: %{public}s', JSON.stringify(err));
+      hilog.error(0x0000, TAG, 'setColorMode failed: %{public}s', JSON.stringify(err));
     }
-    hilog.info(DOMAIN, 'testTag', 'Ability onCreate');
     ScreenUtils.init();
+    hilog.info(0x0000, TAG, '>>> onCreate done, screen: %{public}d x %{public}d',
+      ScreenUtils.getScreenWidthPx(), ScreenUtils.getScreenHeightPx());
   }
 
   onDestroy(): void {
-    hilog.info(DOMAIN, 'testTag', 'Ability onDestroy');
+    hilog.info(0x0000, TAG, '>>> onDestroy');
   }
 
   onWindowStageCreate(windowStage: window.WindowStage): void {
-    hilog.info(DOMAIN, 'testTag', 'Ability onWindowStageCreate');
+    hilog.info(0x0000, TAG, '>>> onWindowStageCreate start');
     this.windowStage = windowStage;
 
     windowStage.loadContent('pages/Index', (err) => {
       if (err.code) {
-        hilog.error(DOMAIN, 'testTag', 'Failed to load content: %{public}s', JSON.stringify(err));
+        hilog.error(0x0000, TAG, '>>> loadContent FAILED: %{public}s', JSON.stringify(err));
         return;
       }
-      hilog.info(DOMAIN, 'testTag', 'Content loaded');
+      hilog.info(0x0000, TAG, '>>> loadContent OK, now requesting permission...');
+      this.initFloatWindow();
     });
+  }
 
-    // 不能用 async/await，框架不会等待异步完成就继续生命周期
-    // 用 .then() 延迟创建悬浮窗
+  private initFloatWindow(): void {
+    hilog.info(0x0000, TAG, '>>> initFloatWindow: requesting permission');
     const context = this.context;
     PermissionHelper.requestFloatWindowPermission(context).then((granted: boolean) => {
-      hilog.info(DOMAIN, 'testTag', 'Permission result: %{public}s', granted.toString());
+      hilog.info(0x0000, TAG, '>>> permission result: %{public}s', granted.toString());
       if (granted) {
+        hilog.info(0x0000, TAG, '>>> calling createFloatWindow...');
         this.floatWindowManager.createFloatWindow(context).then(() => {
-          hilog.info(DOMAIN, 'testTag', 'Float window created successfully');
+          hilog.info(0x0000, TAG, '>>> createFloatWindow resolved OK');
+        }).catch((err: Error) => {
+          hilog.error(0x0000, TAG, '>>> createFloatWindow REJECTED: %{public}s', err.message);
         });
       } else {
-        hilog.warn(DOMAIN, 'testTag', 'Float window permission denied');
+        hilog.warn(0x0000, TAG, '>>> permission DENIED');
       }
+    }).catch((err: Error) => {
+      hilog.error(0x0000, TAG, '>>> requestPermission FAILED: %{public}s', err.message);
     });
   }
 
   onWindowStageDestroy(): void {
-    hilog.info(DOMAIN, 'testTag', 'Ability onWindowStageDestroy');
+    hilog.info(0x0000, TAG, '>>> onWindowStageDestroy');
     this.windowStage = null;
   }
 
   onNewWant(want: Want, launchParam: AbilityConstant.LaunchParam): void {
-    hilog.info(DOMAIN, 'testTag', 'Ability onNewWant');
+    hilog.info(0x0000, TAG, '>>> onNewWant');
     if (want.parameters && want.parameters['showMainPage'] === true) {
       this.hasUserTappedRobot = true;
       router.pushUrl({ url: 'pages/MainPage' });
@@ -68,14 +77,14 @@ export default class EntryAbility extends UIAbility {
   }
 
   onForeground(): void {
-    hilog.info(DOMAIN, 'testTag', 'Ability onForeground');
+    hilog.info(0x0000, TAG, '>>> onForeground, tapped=%{public}s', this.hasUserTappedRobot.toString());
     if (this.hasUserTappedRobot) {
       this.floatWindowManager.hideFloatWindow();
     }
   }
 
   onBackground(): void {
-    hilog.info(DOMAIN, 'testTag', 'Ability onBackground');
+    hilog.info(0x0000, TAG, '>>> onBackground');
     this.floatWindowManager.showFloatWindow();
   }
 }

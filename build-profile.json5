@@ -1,24 +1,78 @@
 {
   "app": {
-    "signingConfigs": [],
+    "signingConfigs": [
+      {
+        "name": "default",
+        "type": "HarmonyOS",
+        "material": {
+          "certpath": "C:\\Users\\x00897182\\.ohos\\config\\default_floating-robot_wF_qsBfkmIcU37r35tBl_4J71eyhLEbR82w3POgocno=.cer",
+          "keyAlias": "debugKey",
+          "keyPassword": "00000019654A33BD5AF8E41701124277C07F08541E6124C25AE1D2F50338FBB41AD4406911F9E24F7B",
+          "profile": "C:\\Users\\x00897182\\.ohos\\config\\default_floating-robot_wF_qsBfkmIcU37r35tBl_4J71eyhLEbR82w3POgocno=.p7b",
+          "signAlg": "SHA256withECDSA",
+          "storeFile": "C:\\Users\\x00897182\\.ohos\\config\\default_floating-robot_wF_qsBfkmIcU37r35tBl_4J71eyhLEbR82w3POgocno=.p12",
+          "storePassword": "00000019ADC4730B20E52214B30025AB5C6F973B6C3859C1F8545FE35BC110C2D309D4EDFF3FE016C1"
+        }
+      }
+    ],
     "products": [
       {
         "name": "default",
         "signingConfig": "default",
-        "targetSdkVersion": "6.0.2(22)",
         "compatibleSdkVersion": "6.0.2(22)",
         "runtimeOS": "HarmonyOS",
         "buildOption": {
           "strictMode": {
             "caseSensitiveCheck": true,
             "useNormalizedOHMUrl": true
+          },
+          "arkOptions": {
+            "buildProfileFields": {
+              "IS_SYSTEM_BUILD": false
+            }
           }
-        }
+        },
+        "targetSdkVersion": "6.0.2(22)"
+      },
+      {
+        "name": "public",
+        "signingConfig": "default",
+        "compatibleSdkVersion": "6.0.2(22)",
+        "runtimeOS": "HarmonyOS",
+        "buildOption": {
+          "strictMode": {
+            "caseSensitiveCheck": true,
+            "useNormalizedOHMUrl": true
+          },
+          "arkOptions": {
+            "buildProfileFields": {
+              "IS_SYSTEM_BUILD": false
+            }
+          }
+        },
+        "targetSdkVersion": "6.0.2(22)"
+      },
+      {
+        "name": "system",
+        "compatibleSdkVersion": "6.0.2(22)",
+        "runtimeOS": "HarmonyOS",
+        "buildOption": {
+          "strictMode": {
+            "caseSensitiveCheck": true,
+            "useNormalizedOHMUrl": true
+          },
+          "arkOptions": {
+            "buildProfileFields": {
+              "IS_SYSTEM_BUILD": true
+            }
+          }
+        },
+        "targetSdkVersion": "6.0.2(22)"
       }
     ],
     "buildModeSet": [
       {
-        "name": "debug",
+        "name": "debug"
       },
       {
         "name": "release"

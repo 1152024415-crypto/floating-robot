@@ -39,41 +39,43 @@ export class FloatWindowManager {
     hilog.info(DOMAIN, TAG, '[create] START');
 
     try {
-      // 最简创建：只做必要步骤
       this.windowInstance = await window.createWindow({
         name: AppConstants.FLOAT_WINDOW_NAME,
         windowType: window.WindowType.TYPE_FLOAT,
         ctx: context
       });
-      hilog.info(DOMAIN, TAG, '[create] window obj created');
+      hilog.info(DOMAIN, TAG, '[create] window created');
 
-      await this.windowInstance.resize(300, 300);
-      hilog.info(DOMAIN, TAG, '[create] resized');
+      const sizePx = ScreenUtils.vpToPx(AppConstants.FLOAT_WINDOW_SIZE);
+      await this.windowInstance.resize(sizePx, sizePx);
 
-      await this.windowInstance.moveWindowTo(100, 100);
-      hilog.info(DOMAIN, TAG, '[create] moved to 100,100');
+      // 初始位置：右下角
+      const initX = ScreenUtils.getScreenWidthPx() - sizePx;
+      const initY = ScreenUtils.getScreenHeightPx() - sizePx;
+      await this.windowInstance.moveWindowTo(initX, initY);
+      this.currentPositionPx = { x: initX, y: initY };
+      hilog.info(DOMAIN, TAG, '[create] size=%{public}d pos=(%{public}d,%{public}d)', sizePx, initX, initY);
 
-      // 用 callback 版本的 setUIContent 来捕获具体错误
+      await this.windowInstance.setWindowBackgroundColor('#00000000');
+
       this.windowInstance.setUIContent('pages/FloatWindowPage', (err) => {
         if (err && err.code) {
-          hilog.error(DOMAIN, TAG, '[create] setUIContent CALLBACK ERROR: code=%{public}d msg=%{public}s', err.code, err.message);
+          hilog.error(DOMAIN, TAG, '[create] setUIContent ERROR: %{public}d %{public}s', err.code, err.message);
         } else {
-          hilog.info(DOMAIN, TAG, '[create] setUIContent CALLBACK OK');
+          hilog.info(DOMAIN, TAG, '[create] setUIContent OK');
         }
       });
-      hilog.info(DOMAIN, TAG, '[create] setUIContent called (callback mode)');
 
       await this.windowInstance.showWindow();
-      hilog.info(DOMAIN, TAG, '[create] showWindow done');
 
       this.appContext = context;
-      this.currentPositionPx = { x: 100, y: 100 };
-      this.lastValidPositionPx = { x: 100, y: 100 };
+      this.lastValidPositionPx = { x: initX, y: initY };
+      this.setupWindowEventListener();
       this.state = FloatWindowState.VISIBLE;
-      hilog.info(DOMAIN, TAG, '[create] ALL DONE');
+      hilog.info(DOMAIN, TAG, '[create] DONE');
     } catch (err) {
       this.state = FloatWindowState.HIDDEN;
-      hilog.error(DOMAIN, TAG, '[create] CATCH: %{public}s', JSON.stringify(err));
+      hilog.error(DOMAIN, TAG, '[create] FAILED: %{public}s', JSON.stringify(err));
     }
   }
 

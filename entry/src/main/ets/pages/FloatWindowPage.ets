@@ -313,7 +313,7 @@ struct FloatWindowPage {
     }
     .width(AppConstants.FLOAT_WINDOW_SIZE)
     .height(AppConstants.FLOAT_WINDOW_SIZE)
-    .backgroundColor('#00000000')
+    .backgroundColor('#200000FF') // 临时半透明蓝色，调试用
     .gesture(
       this.isDeleteMode ? undefined :
       GestureGroup(GestureMode.Exclusive,

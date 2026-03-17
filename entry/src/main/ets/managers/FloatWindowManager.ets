@@ -57,7 +57,8 @@ export class FloatWindowManager {
       await this.windowInstance.setWindowBackgroundColor('#00000000');
       // 锁定竖屏
       await this.windowInstance.setPreferredOrientation(window.Orientation.PORTRAIT);
-      await this.windowInstance.setUIContent('pages/FloatWindowPage');
+      // TODO: 临时使用测试页排查 setUIContent 超时问题
+      await this.windowInstance.setUIContent('pages/FloatTestPage');
       // 设置触摸穿透（窗口中非机器人/气泡区域的触摸事件穿透到下层）
       await this.windowInstance.setWindowTouchable(true);
       await this.windowInstance.showWindow();

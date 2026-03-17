@@ -2,6 +2,7 @@
   "src": [
     "pages/Index",
     "pages/FloatWindowPage",
-    "pages/MainPage"
+    "pages/MainPage",
+    "pages/FloatTestPage"
   ]
 }

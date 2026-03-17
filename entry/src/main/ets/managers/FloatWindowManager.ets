@@ -46,18 +46,19 @@ export class FloatWindowManager {
       });
       hilog.info(DOMAIN, TAG, '[create] window created');
 
+      // 用 px 值，屏幕密度 3.5，300vp = 1050px
       const sizePx = ScreenUtils.vpToPx(AppConstants.FLOAT_WINDOW_SIZE);
       await this.windowInstance.resize(sizePx, sizePx);
+      hilog.info(DOMAIN, TAG, '[create] resized to %{public}d', sizePx);
 
       // 初始位置：右下角
       const initX = ScreenUtils.getScreenWidthPx() - sizePx;
       const initY = ScreenUtils.getScreenHeightPx() - sizePx;
       await this.windowInstance.moveWindowTo(initX, initY);
       this.currentPositionPx = { x: initX, y: initY };
-      hilog.info(DOMAIN, TAG, '[create] size=%{public}d pos=(%{public}d,%{public}d)', sizePx, initX, initY);
+      hilog.info(DOMAIN, TAG, '[create] moved to (%{public}d,%{public}d)', initX, initY);
 
-      await this.windowInstance.setWindowBackgroundColor('#00000000');
-
+      // 注意：不调用 setWindowBackgroundColor，由页面自身控制背景
       this.windowInstance.setUIContent('pages/FloatWindowPage', (err) => {
         if (err && err.code) {
           hilog.error(DOMAIN, TAG, '[create] setUIContent ERROR: %{public}d %{public}s', err.code, err.message);
@@ -65,8 +66,10 @@ export class FloatWindowManager {
           hilog.info(DOMAIN, TAG, '[create] setUIContent OK');
         }
       });
+      hilog.info(DOMAIN, TAG, '[create] setUIContent called');
 
       await this.windowInstance.showWindow();
+      hilog.info(DOMAIN, TAG, '[create] showWindow done');
 
       this.appContext = context;
       this.lastValidPositionPx = { x: initX, y: initY };

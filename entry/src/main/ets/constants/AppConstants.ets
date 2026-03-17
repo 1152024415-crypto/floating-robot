@@ -1,7 +1,7 @@
 export class AppConstants {
   // 悬浮窗
   static readonly FLOAT_WINDOW_NAME: string = 'floatingRobot';
-  static readonly FLOAT_WINDOW_SIZE: number = 300; // vp
+  static readonly FLOAT_WINDOW_SIZE: number = 70; // vp, 仅容纳机器人图标+阴影边距
   static readonly ROBOT_ICON_SIZE: number = 56; // vp
   // 消息气泡
   static readonly BUBBLE_MAX_WIDTH: number = 200; // vp

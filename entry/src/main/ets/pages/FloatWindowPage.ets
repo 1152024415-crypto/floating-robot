@@ -285,35 +285,14 @@ struct FloatWindowPage {
   }
 
   build() {
-    Stack() {
-      if (this.isDeleteZoneVisible) {
-        DeleteZone({
-          isVisible: this.isDeleteZoneVisible,
-          isHighlighted: this.isDeleteZoneHighlighted
-        })
-      }
-
-      if (this.isBubbleVisible) {
-        MessageBubble({
-          message: this.currentMessage,
-          isVisible: this.isBubbleVisible,
-          onConfirm: () => this.onBubbleConfirm()
-        })
-        .position({
-          x: this.getBubbleOffset().x,
-          y: this.getBubbleOffset().y
-        })
-      }
-
+    Stack({ alignContent: Alignment.Center }) {
+      // 机器人居中显示
       RobotView({ robotState: this.robotState })
-        .position({
-          x: (AppConstants.FLOAT_WINDOW_SIZE - AppConstants.ROBOT_ICON_SIZE) / 2,
-          y: (AppConstants.FLOAT_WINDOW_SIZE - AppConstants.ROBOT_ICON_SIZE) / 2
-        })
     }
     .width(AppConstants.FLOAT_WINDOW_SIZE)
     .height(AppConstants.FLOAT_WINDOW_SIZE)
-    .backgroundColor('#200000FF') // 临时半透明蓝色，调试用
+    .borderRadius(AppConstants.FLOAT_WINDOW_SIZE / 2)
+    .clip(true)
     .gesture(
       this.isDeleteMode ? undefined :
       GestureGroup(GestureMode.Exclusive,

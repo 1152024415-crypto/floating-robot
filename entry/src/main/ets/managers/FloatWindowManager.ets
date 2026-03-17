@@ -27,7 +27,7 @@ export class FloatWindowManager {
   }
 
   getWindowPosition(): Position {
-    return { ...this.currentPositionPx };
+    return { x: this.currentPositionPx.x, y: this.currentPositionPx.y };
   }
 
   async createFloatWindow(context: Context): Promise<void> {
@@ -79,7 +79,7 @@ export class FloatWindowManager {
     try {
       // 恢复到隐藏前的位置
       await this.windowInstance.moveWindowTo(this.lastValidPositionPx.x, this.lastValidPositionPx.y);
-      this.currentPositionPx = { ...this.lastValidPositionPx };
+      this.currentPositionPx = { x: this.lastValidPositionPx.x, y: this.lastValidPositionPx.y };
       await this.windowInstance.showWindow();
       this.state = FloatWindowState.VISIBLE;
       hilog.info(DOMAIN, TAG, 'Float window shown at (%{public}d, %{public}d)', this.lastValidPositionPx.x, this.lastValidPositionPx.y);
@@ -95,7 +95,7 @@ export class FloatWindowManager {
     try {
       // TYPE_FLOAT 窗口使用 showWindow/destroyWindow 控制可见性
       // 保存当前位置，移到屏幕外隐藏
-      this.lastValidPositionPx = { ...this.currentPositionPx };
+      this.lastValidPositionPx = { x: this.currentPositionPx.x, y: this.currentPositionPx.y };
       await this.windowInstance.moveWindowTo(-99999, -99999);
       this.state = FloatWindowState.HIDDEN;
       hilog.info(DOMAIN, TAG, 'Float window hidden');

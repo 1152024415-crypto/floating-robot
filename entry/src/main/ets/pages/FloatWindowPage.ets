@@ -157,7 +157,7 @@ struct FloatWindowPage {
   private draggedMessage: Message | null = null;
   private draggedBubbleRemainingMs: number = 0;
 
-  private onDragStart(): void {
+  private handleDragStart(): void {
     this.robotState = RobotState.DRAGGING;
     this.dragManager.onDragStart();
     if (this.isBubbleVisible && this.currentMessage) {
@@ -174,7 +174,7 @@ struct FloatWindowPage {
     this.dragManager.onDragUpdate(offsetX, offsetY);
   }
 
-  private onDragEnd(): void {
+  private handleDragEnd(): void {
     const snapPos = this.dragManager.calcSnapPosition();
     const currentPos = this.floatWindowManager.getWindowPosition();
     const stepCount = 15;
@@ -323,13 +323,13 @@ struct FloatWindowPage {
           }),
         PanGesture({ distance: AppConstants.PAN_DISTANCE_THRESHOLD })
           .onActionStart(() => {
-            this.onDragStart();
+            this.handleDragStart();
           })
           .onActionUpdate((event: GestureEvent) => {
             this.onDragUpdate(event.offsetX, event.offsetY);
           })
           .onActionEnd(() => {
-            this.onDragEnd();
+            this.handleDragEnd();
           }),
         TapGesture()
           .onAction(() => {

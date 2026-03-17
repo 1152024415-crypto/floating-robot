@@ -6,7 +6,7 @@ export struct MessageBubble {
   @Prop message: Message | null = null;
   @Prop isVisible: boolean = false;
   onConfirm: (() => void) | null = null;
-  @State private opacity: number = 0;
+  @State private bubbleOpacity: number = 0;
 
   aboutToAppear(): void {
     if (this.isVisible) {
@@ -16,13 +16,13 @@ export struct MessageBubble {
 
   private fadeIn(): void {
     animateTo({ duration: 200, curve: Curve.EaseOut }, () => {
-      this.opacity = 1;
+      this.bubbleOpacity = 1;
     });
   }
 
   private fadeOut(): void {
     animateTo({ duration: 200, curve: Curve.EaseIn }, () => {
-      this.opacity = 0;
+      this.bubbleOpacity = 0;
     });
   }
 
@@ -65,7 +65,7 @@ export struct MessageBubble {
         offsetX: 0,
         offsetY: 2
       })
-      .opacity(this.opacity)
+      .opacity(this.bubbleOpacity)
     }
   }
 }

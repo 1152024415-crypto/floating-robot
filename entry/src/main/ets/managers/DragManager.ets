@@ -81,6 +81,6 @@ export class DragManager {
   }
 
   getDragStartPosition(): Position {
-    return { ...this.dragStartPositionPx };
+    return { x: this.dragStartPositionPx.x, y: this.dragStartPositionPx.y };
   }
 }

@@ -54,7 +54,7 @@ export class FloatWindowManager {
       hilog.info(DOMAIN, TAG, '[create] moved to 100,100');
 
       // 用 callback 版本的 setUIContent 来捕获具体错误
-      this.windowInstance.setUIContent('pages/FloatTestPage', (err) => {
+      this.windowInstance.setUIContent('pages/FloatWindowPage', (err) => {
         if (err && err.code) {
           hilog.error(DOMAIN, TAG, '[create] setUIContent CALLBACK ERROR: code=%{public}d msg=%{public}s', err.code, err.message);
         } else {

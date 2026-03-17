@@ -294,25 +294,34 @@ struct FloatWindowPage {
     .borderRadius(AppConstants.FLOAT_WINDOW_SIZE / 2)
     .clip(true)
     .gesture(
-      this.isDeleteMode ? undefined :
       GestureGroup(GestureMode.Exclusive,
         LongPressGesture({ repeat: false, duration: AppConstants.LONG_PRESS_DURATION })
           .onAction(() => {
-            this.onLongPress();
+            if (!this.isDeleteMode) {
+              this.onLongPress();
+            }
           }),
         PanGesture({ distance: AppConstants.PAN_DISTANCE_THRESHOLD })
           .onActionStart(() => {
-            this.handleDragStart();
+            if (!this.isDeleteMode) {
+              this.handleDragStart();
+            }
           })
           .onActionUpdate((event: GestureEvent) => {
-            this.onDragUpdate(event.offsetX, event.offsetY);
+            if (!this.isDeleteMode) {
+              this.onDragUpdate(event.offsetX, event.offsetY);
+            }
           })
           .onActionEnd(() => {
-            this.handleDragEnd();
+            if (!this.isDeleteMode) {
+              this.handleDragEnd();
+            }
           }),
         TapGesture()
           .onAction(() => {
-            this.onTap();
+            if (!this.isDeleteMode) {
+              this.onTap();
+            }
           })
       )
     )

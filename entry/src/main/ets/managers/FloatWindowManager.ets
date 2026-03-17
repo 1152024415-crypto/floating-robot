@@ -71,7 +71,7 @@ export class FloatWindowManager {
       this.lastValidPositionPx = { x: 100, y: 100 };
       this.state = FloatWindowState.VISIBLE;
       hilog.info(DOMAIN, TAG, '[create] ALL DONE');
-    } catch (err: Error) {
+    } catch (err) {
       this.state = FloatWindowState.HIDDEN;
       hilog.error(DOMAIN, TAG, '[create] CATCH: %{public}s', JSON.stringify(err));
     }

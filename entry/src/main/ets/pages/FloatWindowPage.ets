@@ -293,12 +293,10 @@ struct FloatWindowPage {
     }
   }
 
-  // 拖拽状态（用 onTouch 实现，避免 PanGesture 在 TYPE_FLOAT 窗口中的坐标偏移问题）
+  // 拖拽状态
   private isDragging: boolean = false;
-  private touchStartScreenX: number = 0;
-  private touchStartScreenY: number = 0;
-  private windowStartX: number = 0;
-  private windowStartY: number = 0;
+  private touchOffsetX: number = 0; // 手指按下时相对窗口左上角的偏移
+  private touchOffsetY: number = 0;
 
   build() {
     Stack({ alignContent: Alignment.Center }) {
@@ -310,44 +308,44 @@ struct FloatWindowPage {
     .borderRadius(AppConstants.FLOAT_WINDOW_SIZE / 2)
     .clip(true)
     .gesture(
-      GestureGroup(GestureMode.Exclusive,
-        LongPressGesture({ repeat: false, duration: AppConstants.LONG_PRESS_DURATION })
-          .onAction(() => {
-            if (!this.isDeleteMode) {
-              this.onLongPress();
-            }
-          }),
-        TapGesture()
-          .onAction(() => {
-            if (!this.isDeleteMode && !this.isDragging) {
-              this.onTap();
-            }
-          })
-      )
+      TapGesture()
+        .onAction(() => {
+          if (!this.isDeleteMode && !this.isDragging) {
+            this.onTap();
+          }
+        })
     )
     .onTouch((event: TouchEvent) => {
       const touch = event.touches[0];
       if (event.type === TouchType.Down) {
-        // 记录触摸起点和窗口起点（用屏幕绝对坐标）
-        this.touchStartScreenX = touch.screenX;
-        this.touchStartScreenY = touch.screenY;
-        const pos = this.floatWindowManager.getWindowPosition();
-        this.windowStartX = pos.x;
-        this.windowStartY = pos.y;
+        // touch.x/y 是手指相对组件的位置（vp），记录为偏移量
+        this.touchOffsetX = touch.x;
+        this.touchOffsetY = touch.y;
         this.isDragging = false;
       } else if (event.type === TouchType.Move) {
-        const dx = touch.screenX - this.touchStartScreenX;
-        const dy = touch.screenY - this.touchStartScreenY;
-        // 超过阈值才算拖拽
-        if (!this.isDragging && (Math.abs(dx) > 5 || Math.abs(dy) > 5)) {
-          this.isDragging = true;
-          this.robotState = RobotState.DRAGGING;
+        // touch.windowX/windowY 是手指相对窗口的位置
+        // touch.displayX/displayY 或 screenX/screenY 是屏幕绝对位置
+        // 方案：让窗口跟随手指，使手指始终在窗口内同一位置
+        // 窗口新位置 = 手指屏幕位置 - 手指在窗口内的偏移
+        const fingerScreenXPx = ScreenUtils.vpToPx(touch.screenX);
+        const fingerScreenYPx = ScreenUtils.vpToPx(touch.screenY);
+        const offsetPx = ScreenUtils.vpToPx(this.touchOffsetX);
+        const offsetPyPx = ScreenUtils.vpToPx(this.touchOffsetY);
+
+        if (!this.isDragging) {
+          const pos = this.floatWindowManager.getWindowPosition();
+          const dx = fingerScreenXPx - offsetPx - pos.x;
+          const dy = fingerScreenYPx - offsetPyPx - pos.y;
+          if (Math.abs(dx) > ScreenUtils.vpToPx(5) || Math.abs(dy) > ScreenUtils.vpToPx(5)) {
+            this.isDragging = true;
+            this.robotState = RobotState.DRAGGING;
+          }
         }
         if (this.isDragging) {
-          // screenX/screenY 是 vp，moveWindowTo 接受 px
-          const newX = this.windowStartX + ScreenUtils.vpToPx(dx);
-          const newY = this.windowStartY + ScreenUtils.vpToPx(dy);
-          this.floatWindowManager.moveWindow(newX, newY);
+          this.floatWindowManager.moveWindow(
+            fingerScreenXPx - offsetPx,
+            fingerScreenYPx - offsetPyPx
+          );
         }
       } else if (event.type === TouchType.Up) {
         if (this.isDragging) {

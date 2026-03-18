@@ -23,24 +23,10 @@ export class DragManager {
   }
 
   onDragUpdate(offsetXVp: number, offsetYVp: number): void {
-    const offsetXPx = ScreenUtils.vpToPx(offsetXVp);
-    const offsetYPx = ScreenUtils.vpToPx(offsetYVp);
-    this.pendingX = this.dragStartPositionPx.x + offsetXPx;
-    this.pendingY = this.dragStartPositionPx.y + offsetYPx;
-
-    const now = Date.now();
-    if (now - this.lastMoveTime >= 30) {
-      // 直接执行
-      this.lastMoveTime = now;
-      this.floatWindowManager.moveWindow(this.pendingX, this.pendingY);
-    } else if (this.throttleTimer === -1) {
-      // 延迟到下一个时间窗口执行
-      this.throttleTimer = setTimeout(() => {
-        this.throttleTimer = -1;
-        this.lastMoveTime = Date.now();
-        this.floatWindowManager.moveWindow(this.pendingX, this.pendingY);
-      }, 30 - (now - this.lastMoveTime));
-    }
+    // 直接用 vp 偏移量计算，不做 px 转换（moveWindowTo 可能接受 vp）
+    const newX = this.dragStartPositionPx.x + offsetXVp;
+    const newY = this.dragStartPositionPx.y + offsetYVp;
+    this.floatWindowManager.moveWindow(newX, newY);
   }
 
   calcSnapPosition(): Position {

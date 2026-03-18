@@ -6,6 +6,7 @@ export struct MessageBubble {
   @Prop isVisible: boolean = false;
   onLike: (() => void) | null = null;
   onDislike: (() => void) | null = null;
+  onClose: (() => void) | null = null;
   @State private bubbleOpacity: number = 0;
   @State private bubbleScale: number = 0.8;
 
@@ -23,15 +24,30 @@ export struct MessageBubble {
   build() {
     if (this.isVisible && this.message) {
       Column() {
+        // 顶部：关闭按钮
+        Row() {
+          Blank()
+          Text('x')
+            .fontSize(14)
+            .fontColor('#999999')
+            .onClick(() => {
+              if (this.onClose) {
+                this.onClose();
+              }
+            })
+        }
+        .width('100%')
+        .padding({ right: 8, top: 4 })
+
         // 消息内容
         Text(this.message.content)
           .fontSize(13)
           .fontColor('#333333')
           .maxLines(2)
           .textOverflow({ overflow: TextOverflow.Ellipsis })
-          .padding({ left: 10, right: 10, top: 8, bottom: 6 })
+          .padding({ left: 10, right: 10, bottom: 6 })
 
-        // 👍/👎 反馈栏
+        // 反馈栏
         Row({ space: 16 }) {
           Text('👍')
             .fontSize(16)

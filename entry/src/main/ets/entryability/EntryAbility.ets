@@ -52,7 +52,9 @@ export default class EntryAbility extends UIAbility {
       if (granted) {
         hilog.info(0x0000, TAG, '>>> calling createFloatWindow...');
         this.floatWindowManager.createFloatWindow(context).then(() => {
-          hilog.info(0x0000, TAG, '>>> createFloatWindow resolved OK');
+          hilog.info(0x0000, TAG, '>>> createFloatWindow resolved OK, hiding (app in foreground)');
+          // 创建后立即隐藏，等 app 退到后台时 onBackground 会显示
+          this.floatWindowManager.hideFloatWindow();
         }).catch((err: Error) => {
           hilog.error(0x0000, TAG, '>>> createFloatWindow REJECTED: %{public}s', err.message);
         });

@@ -320,7 +320,8 @@ struct FloatWindowPage {
           message: this.currentMessage,
           isVisible: this.isBubbleVisible,
           onLike: () => this.onBubbleLike(),
-          onDislike: () => this.onBubbleDislike()
+          onDislike: () => this.onBubbleDislike(),
+          onClose: () => this.dismissBubble()
         })
         .layoutWeight(1)
         .margin({ right: 6 })

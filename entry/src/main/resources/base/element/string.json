@@ -1,5 +1,6 @@
 {
   "string": [
+    { "name": "app_name", "value": "悬浮AI助手" },
     { "name": "module_desc", "value": "悬浮AI助手模块" },
     { "name": "EntryAbility_desc", "value": "悬浮AI助手机器人" },
     { "name": "EntryAbility_label", "value": "AI助手" },

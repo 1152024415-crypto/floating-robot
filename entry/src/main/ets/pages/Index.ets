@@ -1,23 +1,32 @@
 @Entry
 @Component
 struct Index {
-  @State message: string = 'Hello World';
-
   build() {
-    RelativeContainer() {
-      Text(this.message)
-        .id('HelloWorld')
-        .fontSize($r('app.float.page_text_font_size'))
+    Column({ space: 16 }) {
+      Image($r('app.media.robot_icon'))
+        .width(80)
+        .height(80)
+        .borderRadius(40)
+        .shadow({
+          radius: 12,
+          color: '#30000000',
+          offsetX: 0,
+          offsetY: 4
+        })
+
+      Text($r('app.string.app_name'))
+        .fontSize(22)
         .fontWeight(FontWeight.Bold)
-        .alignRules({
-          center: { anchor: '__container__', align: VerticalAlign.Center },
-          middle: { anchor: '__container__', align: HorizontalAlign.Center }
-        })
-        .onClick(() => {
-          this.message = 'Welcome';
-        })
+        .fontColor('#333333')
+
+      Text('退到后台即可使用悬浮助手')
+        .fontSize(14)
+        .fontColor('#999999')
     }
-    .height('100%')
     .width('100%')
+    .height('100%')
+    .justifyContent(FlexAlign.Center)
+    .alignItems(HorizontalAlign.Center)
+    .backgroundColor('#F5F5F5')
   }
 }

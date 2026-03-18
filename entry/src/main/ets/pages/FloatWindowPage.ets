@@ -158,10 +158,19 @@ struct FloatWindowPage {
     }
   }
 
-  private onBubbleConfirm(): void {
+  private onBubbleLike(): void {
     if (this.currentMessage) {
       this.messageService.markAsRead(this.currentMessage.id);
       this.feedbackService.onAction(FeedbackType.CONFIRM, this.currentMessage.id);
+      hilog.info(DOMAIN, TAG, 'User liked message: %{public}s', this.currentMessage.id);
+    }
+    this.dismissBubble();
+  }
+
+  private onBubbleDislike(): void {
+    if (this.currentMessage) {
+      this.messageService.markAsRead(this.currentMessage.id);
+      hilog.info(DOMAIN, TAG, 'User disliked message: %{public}s', this.currentMessage.id);
     }
     this.dismissBubble();
   }
@@ -338,7 +347,8 @@ struct FloatWindowPage {
         MessageBubble({
           message: this.currentMessage,
           isVisible: this.isBubbleVisible,
-          onConfirm: () => this.onBubbleConfirm()
+          onLike: () => this.onBubbleLike(),
+          onDislike: () => this.onBubbleDislike()
         })
         .margin({ right: 8 })
       }

@@ -27,12 +27,13 @@ export class AnimationManager {
 
     switch (this.currentState) {
       case RobotState.IDLE:
+        // 轻柔上下浮动 + 微缩放
         return {
-          scaleX: this.animationPhase ? 1.05 : 0.95,
-          scaleY: this.animationPhase ? 1.05 : 0.95,
-          rotate: 0,
-          translateY: 0,
-          duration: 1500,
+          scaleX: this.animationPhase ? 1.03 : 0.97,
+          scaleY: this.animationPhase ? 1.03 : 0.97,
+          rotate: this.animationPhase ? 3 : -3,
+          translateY: this.animationPhase ? -4 : 4,
+          duration: 2000,
           curve: Curve.EaseInOut
         };
 

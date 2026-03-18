@@ -31,7 +31,7 @@ export class DragManager {
 
   calcSnapPosition(): Position {
     const currentPos = this.floatWindowManager.getWindowPosition();
-    const windowSizePx = ScreenUtils.vpToPx(AppConstants.FLOAT_WINDOW_SIZE);
+    const windowSizePx = ScreenUtils.vpToPx(AppConstants.FLOAT_WINDOW_WIDTH);
     const robotSizePx = ScreenUtils.vpToPx(AppConstants.ROBOT_ICON_SIZE);
     const marginPx = ScreenUtils.vpToPx(AppConstants.EDGE_SNAP_MARGIN);
     const screenW = ScreenUtils.getScreenWidthPx();

@@ -57,15 +57,15 @@ export class FloatWindowManager {
       });
       hilog.info(DOMAIN, TAG, '[create] window created');
 
-      // 用 px 值，屏幕密度 3.5，300vp = 1050px
-      const sizePx = ScreenUtils.vpToPx(AppConstants.FLOAT_WINDOW_SIZE);
-      await this.windowInstance.resize(sizePx, sizePx);
-      hilog.info(DOMAIN, TAG, '[create] resized to %{public}d', sizePx);
+      const widthPx = ScreenUtils.vpToPx(AppConstants.FLOAT_WINDOW_WIDTH);
+      const heightPx = ScreenUtils.vpToPx(AppConstants.FLOAT_WINDOW_HEIGHT);
+      await this.windowInstance.resize(widthPx, heightPx);
+      hilog.info(DOMAIN, TAG, '[create] resized to %{public}d x %{public}d', widthPx, heightPx);
 
-      // 初始位置：右侧偏上（避免挡住底部 app 图标，上移约 2 个 app 图标高度）
-      const initX = ScreenUtils.getScreenWidthPx() - sizePx;
+      // 初始位置：右侧偏上（避免挡住底部 app 图标）
+      const initX = ScreenUtils.getScreenWidthPx() - widthPx;
       const appIconOffset = ScreenUtils.vpToPx(160);
-      const initY = ScreenUtils.getScreenHeightPx() - sizePx - appIconOffset;
+      const initY = ScreenUtils.getScreenHeightPx() - heightPx - appIconOffset;
       await this.windowInstance.moveWindowTo(initX, initY);
       this.currentPositionPx = { x: initX, y: initY };
       hilog.info(DOMAIN, TAG, '[create] moved to (%{public}d,%{public}d)', initX, initY);
@@ -153,13 +153,6 @@ export class FloatWindowManager {
     this.windowInstance.on('windowEvent', (eventType: number) => {
       hilog.info(DOMAIN, TAG, 'Window event: %{public}d', eventType);
     });
-  }
-
-  resizeWindow(widthPx: number, heightPx: number): void {
-    if (!this.windowInstance || this.state !== FloatWindowState.VISIBLE) {
-      return;
-    }
-    this.windowInstance.resize(widthPx, heightPx);
   }
 
   moveWindow(xPx: number, yPx: number): void {

@@ -69,50 +69,23 @@ struct FloatWindowPage {
 
   private showBubble(msg: Message): void {
     this.currentMessage = msg;
+    this.isBubbleVisible = true;
     this.robotState = RobotState.MESSAGE;
-    // 先扩大窗口，等窗口调整完成后再显示气泡内容
-    this.expandWindow();
-    setTimeout(() => {
-      this.isBubbleVisible = true;
-      this.startBubbleTimer();
-    }, 100);
+    this.startBubbleTimer();
   }
 
   private dismissBubble(): void {
     this.clearBubbleTimer();
-    // 先缩回窗口（视觉上气泡被收起）
-    this.shrinkWindow();
-    // 延迟后清理状态
+    this.isBubbleVisible = false;
+    this.currentMessage = null;
+    this.robotState = RobotState.IDLE;
+
     setTimeout(() => {
-      this.isBubbleVisible = false;
-      this.currentMessage = null;
-      this.robotState = RobotState.IDLE;
-      // 检查队列
-      setTimeout(() => {
-        const next = this.messageService.popNextUnread();
-        if (next && !this.isDeleteMode) {
-          this.showBubble(next);
-        }
-      }, 500);
-    }, 200);
-  }
-
-  private expandWindow(): void {
-    const expandW = ScreenUtils.vpToPx(AppConstants.FLOAT_WINDOW_EXPANDED_WIDTH);
-    const expandH = ScreenUtils.vpToPx(AppConstants.FLOAT_WINDOW_EXPANDED_HEIGHT);
-    const robotSizePx = ScreenUtils.vpToPx(AppConstants.FLOAT_WINDOW_SIZE);
-    // 保存展开前位置
-    this.preExpandPosition = this.floatWindowManager.getWindowPosition();
-    const newX = this.preExpandPosition.x - (expandW - robotSizePx);
-    this.floatWindowManager.resizeWindow(expandW, expandH);
-    this.floatWindowManager.moveWindow(newX, this.preExpandPosition.y);
-  }
-
-  private shrinkWindow(): void {
-    const robotSizePx = ScreenUtils.vpToPx(AppConstants.FLOAT_WINDOW_SIZE);
-    // 精确恢复到展开前的位置
-    this.floatWindowManager.resizeWindow(robotSizePx, robotSizePx);
-    this.floatWindowManager.moveWindow(this.preExpandPosition.x, this.preExpandPosition.y);
+      const next = this.messageService.popNextUnread();
+      if (next && !this.isDeleteMode) {
+        this.showBubble(next);
+      }
+    }, 500);
   }
 
   private showBubbleWithRemaining(msg: Message, remainingMs: number): void {
@@ -142,7 +115,7 @@ struct FloatWindowPage {
 
   private updateCurrentEdge(): void {
     const pos = this.floatWindowManager.getWindowPosition();
-    const windowSizePx = ScreenUtils.vpToPx(AppConstants.FLOAT_WINDOW_SIZE);
+    const windowSizePx = ScreenUtils.vpToPx(AppConstants.FLOAT_WINDOW_WIDTH);
     const cx = pos.x + windowSizePx / 2;
     const cy = pos.y + windowSizePx / 2;
     this.currentEdge = this.dragManager.calcNearestEdge(
@@ -318,7 +291,7 @@ struct FloatWindowPage {
 
   private getBubbleOffset(): Position {
     const robotSize = AppConstants.ROBOT_ICON_SIZE;
-    const windowSize = AppConstants.FLOAT_WINDOW_SIZE;
+    const windowSize = AppConstants.FLOAT_WINDOW_WIDTH;
     const center = windowSize / 2;
     switch (this.currentEdge) {
       case EdgePosition.RIGHT:
@@ -334,9 +307,6 @@ struct FloatWindowPage {
     }
   }
 
-  // 气泡展开前的窗口位置，用于精确恢复
-  private preExpandPosition: Position = { x: 0, y: 0 };
-
   // 拖拽状态
   private isDragging: boolean = false;
   private touchOffsetX: number = 0; // 手指按下时相对窗口左上角的偏移
@@ -344,7 +314,7 @@ struct FloatWindowPage {
 
   build() {
     Row() {
-      // 气泡在左侧
+      // 气泡在左侧，占剩余空间
       if (this.isBubbleVisible && this.currentMessage) {
         MessageBubble({
           message: this.currentMessage,
@@ -352,20 +322,23 @@ struct FloatWindowPage {
           onLike: () => this.onBubbleLike(),
           onDislike: () => this.onBubbleDislike()
         })
-        .margin({ right: 8 })
+        .layoutWeight(1)
+        .margin({ right: 6 })
+      } else {
+        // 无气泡时用空白占位，把机器人推到最右
+        Blank()
       }
-      // 机器人在右侧
+      // 机器人固定在右侧
       Stack({ alignContent: Alignment.Center }) {
         RobotView({ robotState: this.robotState })
       }
-      .width(AppConstants.FLOAT_WINDOW_SIZE)
-      .height(AppConstants.FLOAT_WINDOW_SIZE)
-      .borderRadius(AppConstants.FLOAT_WINDOW_SIZE / 2)
+      .width(AppConstants.ROBOT_WINDOW_SIZE)
+      .height(AppConstants.ROBOT_WINDOW_SIZE)
+      .borderRadius(AppConstants.ROBOT_WINDOW_SIZE / 2)
     }
-    .width('100%')
-    .height('100%')
+    .width(AppConstants.FLOAT_WINDOW_WIDTH)
+    .height(AppConstants.FLOAT_WINDOW_HEIGHT)
     .backgroundColor('#00000000')
-    .justifyContent(FlexAlign.End)
     .alignItems(VerticalAlign.Center)
     .gesture(
       TapGesture()

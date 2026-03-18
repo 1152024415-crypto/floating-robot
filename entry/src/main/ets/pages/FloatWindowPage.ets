@@ -69,11 +69,13 @@ struct FloatWindowPage {
 
   private showBubble(msg: Message): void {
     this.currentMessage = msg;
-    this.isBubbleVisible = true;
     this.robotState = RobotState.MESSAGE;
-    // 扩大窗口以显示气泡
+    // 先扩大窗口，等窗口调整完成后再显示气泡内容
     this.expandWindow();
-    this.startBubbleTimer();
+    setTimeout(() => {
+      this.isBubbleVisible = true;
+      this.startBubbleTimer();
+    }, 100);
   }
 
   private dismissBubble(): void {

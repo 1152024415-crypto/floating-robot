@@ -1,5 +1,6 @@
 import { window } from '@kit.ArkUI';
 import { hilog } from '@kit.PerformanceAnalysisKit';
+import { common } from '@kit.AbilityKit';
 import { AppConstants } from '../constants/AppConstants';
 import { FloatWindowState, Position } from '../models/RobotState';
 import { ScreenUtils } from '../utils/ScreenUtils';
@@ -14,6 +15,16 @@ export class FloatWindowManager {
   private currentPositionPx: Position = { x: 0, y: 0 };
   private lastValidPositionPx: Position = { x: 0, y: 0 };
   private appContext: Context | null = null;
+  // 保存 UIAbilityContext 供悬浮窗页面使用（悬浮窗自身的 getContext 权限不足）
+  private static abilityContext: common.UIAbilityContext | null = null;
+
+  static setAbilityContext(ctx: common.UIAbilityContext): void {
+    FloatWindowManager.abilityContext = ctx;
+  }
+
+  static getAbilityContext(): common.UIAbilityContext | null {
+    return FloatWindowManager.abilityContext;
+  }
 
   static getInstance(): FloatWindowManager {
     if (!FloatWindowManager.instance) {
@@ -137,14 +148,9 @@ export class FloatWindowManager {
 
   private setupWindowEventListener(): void {
     if (!this.windowInstance) return;
-    this.windowInstance.on('windowEvent', async (eventType: number) => {
+    // WindowEventType: 1=SHOWN, 2=ACTIVE, 3=INACTIVE, 4=HIDDEN
+    this.windowInstance.on('windowEvent', (eventType: number) => {
       hilog.info(DOMAIN, TAG, 'Window event: %{public}d', eventType);
-      if (eventType === 1 && this.appContext) {
-        this.windowInstance = null;
-        this.state = FloatWindowState.HIDDEN;
-        hilog.warn(DOMAIN, TAG, 'Window reclaimed by system, recreating...');
-        await this.createFloatWindow(this.appContext);
-      }
     });
   }
 

@@ -144,9 +144,10 @@ struct FloatWindowPage {
 
     hilog.info(DOMAIN, TAG, 'Robot tapped, opening app');
     this.floatWindowManager.hideFloatWindow();
-    try {
-      const context = getContext(this) as common.UIAbilityContext;
-      context.startAbility({
+    // 使用 EntryAbility 保存的 UIAbilityContext（悬浮窗自身的 context 权限不足）
+    const abilityContext = FloatWindowManager.getAbilityContext();
+    if (abilityContext) {
+      abilityContext.startAbility({
         bundleName: 'com.xxy.airobot',
         abilityName: 'EntryAbility',
         parameters: { 'showMainPage': true }
@@ -155,8 +156,8 @@ struct FloatWindowPage {
       }).catch((err: Object) => {
         hilog.error(DOMAIN, TAG, 'startAbility FAILED: %{public}s', JSON.stringify(err));
       });
-    } catch (err) {
-      hilog.error(DOMAIN, TAG, 'startAbility CATCH: %{public}s', JSON.stringify(err));
+    } else {
+      hilog.error(DOMAIN, TAG, 'No ability context available');
     }
   }
 

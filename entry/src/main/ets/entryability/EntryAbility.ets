@@ -21,6 +21,8 @@ export default class EntryAbility extends UIAbility {
       hilog.error(0x0000, TAG, 'setColorMode failed: %{public}s', JSON.stringify(err));
     }
     ScreenUtils.init();
+    // 保存 UIAbilityContext 供悬浮窗页面使用
+    FloatWindowManager.setAbilityContext(this.context);
     hilog.info(0x0000, TAG, '>>> onCreate done, screen: %{public}d x %{public}d',
       ScreenUtils.getScreenWidthPx(), ScreenUtils.getScreenHeightPx());
   }

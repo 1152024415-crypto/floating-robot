@@ -328,26 +328,26 @@ struct FloatWindowPage {
         // 无气泡时用空白占位，把机器人推到最右
         Blank()
       }
-      // 机器人固定在右侧
+      // 机器人固定在右侧，点击手势绑在机器人上
       Stack({ alignContent: Alignment.Center }) {
         RobotView({ robotState: this.robotState })
       }
       .width(AppConstants.ROBOT_WINDOW_SIZE)
       .height(AppConstants.ROBOT_WINDOW_SIZE)
       .borderRadius(AppConstants.ROBOT_WINDOW_SIZE / 2)
+      .gesture(
+        TapGesture()
+          .onAction(() => {
+            if (!this.isDeleteMode && !this.isDragging) {
+              this.onTap();
+            }
+          })
+      )
     }
     .width(AppConstants.FLOAT_WINDOW_WIDTH)
     .height(AppConstants.FLOAT_WINDOW_HEIGHT)
     .backgroundColor('#00000000')
     .alignItems(VerticalAlign.Center)
-    .gesture(
-      TapGesture()
-        .onAction(() => {
-          if (!this.isDeleteMode && !this.isDragging) {
-            this.onTap();
-          }
-        })
-    )
     .onTouch((event: TouchEvent) => {
       const touch = event.touches[0];
       const pos = this.floatWindowManager.getWindowPosition();

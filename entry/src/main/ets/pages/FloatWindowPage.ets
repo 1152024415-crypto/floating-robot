@@ -78,18 +78,21 @@ struct FloatWindowPage {
 
   private dismissBubble(): void {
     this.clearBubbleTimer();
-    this.isBubbleVisible = false;
-    this.currentMessage = null;
-    this.robotState = RobotState.IDLE;
-    // 缩回机器人大小
+    // 先缩回窗口（视觉上气泡被收起）
     this.shrinkWindow();
-
+    // 延迟后清理状态
     setTimeout(() => {
-      const next = this.messageService.popNextUnread();
-      if (next && !this.isDeleteMode) {
-        this.showBubble(next);
-      }
-    }, 500);
+      this.isBubbleVisible = false;
+      this.currentMessage = null;
+      this.robotState = RobotState.IDLE;
+      // 检查队列
+      setTimeout(() => {
+        const next = this.messageService.popNextUnread();
+        if (next && !this.isDeleteMode) {
+          this.showBubble(next);
+        }
+      }, 500);
+    }, 200);
   }
 
   private expandWindow(): void {

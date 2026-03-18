@@ -2,12 +2,12 @@ export class AppConstants {
   // 悬浮窗
   static readonly FLOAT_WINDOW_NAME: string = 'floatingRobot';
   static readonly FLOAT_WINDOW_SIZE: number = 70; // vp, 仅容纳机器人图标+阴影边距
-  static readonly FLOAT_WINDOW_EXPANDED_WIDTH: number = 280; // vp, 展开时容纳气泡+机器人
-  static readonly FLOAT_WINDOW_EXPANDED_HEIGHT: number = 90; // vp, 展开高度
+  static readonly FLOAT_WINDOW_EXPANDED_WIDTH: number = 260; // vp, 展开时容纳气泡+机器人
+  static readonly FLOAT_WINDOW_EXPANDED_HEIGHT: number = 80; // vp, 展开高度
   static readonly ROBOT_ICON_SIZE: number = 56; // vp
   // 消息气泡
-  static readonly BUBBLE_MAX_WIDTH: number = 200; // vp
-  static readonly BUBBLE_MAX_HEIGHT: number = 80; // vp
+  static readonly BUBBLE_MAX_WIDTH: number = 180; // vp
+  static readonly BUBBLE_MAX_HEIGHT: number = 70; // vp
   static readonly BUBBLE_DISMISS_TIME: number = 10000; // ms
   static readonly MESSAGE_QUEUE_MAX: number = 20;
   // 边缘吸附
@@ -20,5 +20,5 @@ export class AppConstants {
   static readonly PAN_DISTANCE_THRESHOLD: number = 5; // vp
   static readonly TAP_DEBOUNCE: number = 300; // ms
   // 打桩
-  static readonly MOCK_MESSAGE_INTERVAL: number = 15000; // ms
+  static readonly MOCK_MESSAGE_INTERVAL: number = 30000; // ms
 }

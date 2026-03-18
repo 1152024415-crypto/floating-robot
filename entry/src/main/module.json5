@@ -49,6 +49,14 @@
           "abilities": ["EntryAbility"],
           "when": "always"
         }
+      },
+      {
+        "name": "ohos.permission.START_ABILITIES_FROM_BACKGROUND",
+        "reason": "$string:float_window_reason",
+        "usedScene": {
+          "abilities": ["EntryAbility"],
+          "when": "always"
+        }
       }
     ]
   }

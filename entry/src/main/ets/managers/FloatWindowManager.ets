@@ -69,13 +69,6 @@ export class FloatWindowManager {
       this.currentPositionPx = { x: initX, y: initY };
       hilog.info(DOMAIN, TAG, '[create] moved to (%{public}d,%{public}d)', initX, initY);
 
-      try {
-        await this.windowInstance.setWindowBackgroundColor('#00000000');
-        hilog.info(DOMAIN, TAG, '[create] bg transparent set');
-      } catch (bgErr) {
-        hilog.warn(DOMAIN, TAG, '[create] setWindowBackgroundColor failed, continuing...');
-      }
-
       this.windowInstance.setUIContent('pages/FloatWindowPage', (err) => {
         if (err && err.code) {
           hilog.error(DOMAIN, TAG, '[create] setUIContent ERROR: %{public}d %{public}s', err.code, err.message);
@@ -83,10 +76,17 @@ export class FloatWindowManager {
           hilog.info(DOMAIN, TAG, '[create] setUIContent OK');
         }
       });
-      hilog.info(DOMAIN, TAG, '[create] setUIContent called');
 
       await this.windowInstance.showWindow();
       hilog.info(DOMAIN, TAG, '[create] showWindow done');
+
+      // 在 showWindow 之后设置透明背景
+      try {
+        await this.windowInstance.setWindowBackgroundColor('#00000000');
+        hilog.info(DOMAIN, TAG, '[create] bg transparent set');
+      } catch (bgErr) {
+        hilog.warn(DOMAIN, TAG, '[create] setWindowBackgroundColor failed');
+      }
 
       this.appContext = context;
       this.lastValidPositionPx = { x: initX, y: initY };

@@ -66,6 +66,8 @@ struct FloatWindowPage {
     this.currentMessage = msg;
     this.isBubbleVisible = true;
     this.robotState = RobotState.MESSAGE;
+    // 扩大窗口以显示气泡
+    this.expandWindow();
     this.startBubbleTimer();
   }
 
@@ -74,6 +76,8 @@ struct FloatWindowPage {
     this.isBubbleVisible = false;
     this.currentMessage = null;
     this.robotState = RobotState.IDLE;
+    // 缩回机器人大小
+    this.shrinkWindow();
 
     setTimeout(() => {
       const next = this.messageService.popNextUnread();
@@ -81,6 +85,27 @@ struct FloatWindowPage {
         this.showBubble(next);
       }
     }, 500);
+  }
+
+  private expandWindow(): void {
+    const expandW = ScreenUtils.vpToPx(AppConstants.FLOAT_WINDOW_EXPANDED_WIDTH);
+    const expandH = ScreenUtils.vpToPx(AppConstants.FLOAT_WINDOW_EXPANDED_HEIGHT);
+    const robotSizePx = ScreenUtils.vpToPx(AppConstants.FLOAT_WINDOW_SIZE);
+    const pos = this.floatWindowManager.getWindowPosition();
+    // 向左扩展（机器人在右侧），窗口左移
+    const newX = pos.x - (expandW - robotSizePx);
+    this.floatWindowManager.resizeWindow(expandW, expandH);
+    this.floatWindowManager.moveWindow(newX, pos.y);
+  }
+
+  private shrinkWindow(): void {
+    const robotSizePx = ScreenUtils.vpToPx(AppConstants.FLOAT_WINDOW_SIZE);
+    const expandW = ScreenUtils.vpToPx(AppConstants.FLOAT_WINDOW_EXPANDED_WIDTH);
+    const pos = this.floatWindowManager.getWindowPosition();
+    // 缩回时窗口右移回原位
+    const newX = pos.x + (expandW - robotSizePx);
+    this.floatWindowManager.resizeWindow(robotSizePx, robotSizePx);
+    this.floatWindowManager.moveWindow(newX, pos.y);
   }
 
   private showBubbleWithRemaining(msg: Message, remainingMs: number): void {
@@ -299,14 +324,29 @@ struct FloatWindowPage {
   private touchOffsetY: number = 0;
 
   build() {
-    Stack({ alignContent: Alignment.Center }) {
-      RobotView({ robotState: this.robotState })
+    Row() {
+      // 气泡在左侧
+      if (this.isBubbleVisible && this.currentMessage) {
+        MessageBubble({
+          message: this.currentMessage,
+          isVisible: this.isBubbleVisible,
+          onConfirm: () => this.onBubbleConfirm()
+        })
+        .margin({ right: 8 })
+      }
+      // 机器人在右侧
+      Stack({ alignContent: Alignment.Center }) {
+        RobotView({ robotState: this.robotState })
+      }
+      .width(AppConstants.FLOAT_WINDOW_SIZE)
+      .height(AppConstants.FLOAT_WINDOW_SIZE)
+      .borderRadius(AppConstants.FLOAT_WINDOW_SIZE / 2)
     }
-    .width(AppConstants.FLOAT_WINDOW_SIZE)
-    .height(AppConstants.FLOAT_WINDOW_SIZE)
+    .width('100%')
+    .height('100%')
     .backgroundColor('#00000000')
-    .borderRadius(AppConstants.FLOAT_WINDOW_SIZE / 2)
-    .clip(true)
+    .justifyContent(FlexAlign.End)
+    .alignItems(VerticalAlign.Center)
     .gesture(
       TapGesture()
         .onAction(() => {
@@ -322,9 +362,6 @@ struct FloatWindowPage {
         this.touchOffsetX = touch.x;
         this.touchOffsetY = touch.y;
         this.isDragging = false;
-        // 打印所有坐标，搞清楚坐标系
-        hilog.info(DOMAIN, TAG, 'DOWN x=%{public}f y=%{public}f screenX=%{public}f screenY=%{public}f winPos=(%{public}d,%{public}d)',
-          touch.x, touch.y, touch.screenX, touch.screenY, pos.x, pos.y);
       } else if (event.type === TouchType.Move) {
         if (!this.isDragging) {
           const dx = touch.screenX - this.touchOffsetX;
@@ -332,12 +369,10 @@ struct FloatWindowPage {
           if (Math.abs(dx) > 5 || Math.abs(dy) > 5) {
             this.isDragging = true;
             this.robotState = RobotState.DRAGGING;
-            hilog.info(DOMAIN, TAG, 'DRAG START');
           }
         }
         if (this.isDragging) {
-          hilog.info(DOMAIN, TAG, 'MOVE screenX=%{public}f screenY=%{public}f', touch.screenX, touch.screenY);
-          // 先试不转换，直接用 screenX 减偏移
+          // 窗口跟随手指
           this.floatWindowManager.moveWindow(
             touch.screenX - this.touchOffsetX + pos.x,
             touch.screenY - this.touchOffsetY + pos.y

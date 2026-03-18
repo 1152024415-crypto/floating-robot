@@ -154,6 +154,13 @@ export class FloatWindowManager {
     });
   }
 
+  resizeWindow(widthPx: number, heightPx: number): void {
+    if (!this.windowInstance || this.state !== FloatWindowState.VISIBLE) {
+      return;
+    }
+    this.windowInstance.resize(widthPx, heightPx);
+  }
+
   moveWindow(xPx: number, yPx: number): void {
     if (!this.windowInstance || this.state !== FloatWindowState.VISIBLE) {
       return;

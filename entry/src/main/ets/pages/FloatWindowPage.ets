@@ -144,12 +144,20 @@ struct FloatWindowPage {
 
     hilog.info(DOMAIN, TAG, 'Robot tapped, opening app');
     this.floatWindowManager.hideFloatWindow();
-    const context = getContext(this) as common.UIAbilityContext;
-    context.startAbility({
-      bundleName: 'com.xxy.airobot',
-      abilityName: 'EntryAbility',
-      parameters: { 'showMainPage': true }
-    });
+    try {
+      const context = getContext(this) as common.UIAbilityContext;
+      context.startAbility({
+        bundleName: 'com.xxy.airobot',
+        abilityName: 'EntryAbility',
+        parameters: { 'showMainPage': true }
+      }).then(() => {
+        hilog.info(DOMAIN, TAG, 'startAbility OK');
+      }).catch((err: Object) => {
+        hilog.error(DOMAIN, TAG, 'startAbility FAILED: %{public}s', JSON.stringify(err));
+      });
+    } catch (err) {
+      hilog.error(DOMAIN, TAG, 'startAbility CATCH: %{public}s', JSON.stringify(err));
+    }
   }
 
   // ===== 拖拽 =====
@@ -291,6 +299,7 @@ struct FloatWindowPage {
     }
     .width(AppConstants.FLOAT_WINDOW_SIZE)
     .height(AppConstants.FLOAT_WINDOW_SIZE)
+    .backgroundColor('#00000000')
     .borderRadius(AppConstants.FLOAT_WINDOW_SIZE / 2)
     .clip(true)
     .gesture(

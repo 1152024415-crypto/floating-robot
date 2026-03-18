@@ -99,21 +99,18 @@ struct FloatWindowPage {
     const expandW = ScreenUtils.vpToPx(AppConstants.FLOAT_WINDOW_EXPANDED_WIDTH);
     const expandH = ScreenUtils.vpToPx(AppConstants.FLOAT_WINDOW_EXPANDED_HEIGHT);
     const robotSizePx = ScreenUtils.vpToPx(AppConstants.FLOAT_WINDOW_SIZE);
-    const pos = this.floatWindowManager.getWindowPosition();
-    // 向左扩展（机器人在右侧），窗口左移
-    const newX = pos.x - (expandW - robotSizePx);
+    // 保存展开前位置
+    this.preExpandPosition = this.floatWindowManager.getWindowPosition();
+    const newX = this.preExpandPosition.x - (expandW - robotSizePx);
     this.floatWindowManager.resizeWindow(expandW, expandH);
-    this.floatWindowManager.moveWindow(newX, pos.y);
+    this.floatWindowManager.moveWindow(newX, this.preExpandPosition.y);
   }
 
   private shrinkWindow(): void {
     const robotSizePx = ScreenUtils.vpToPx(AppConstants.FLOAT_WINDOW_SIZE);
-    const expandW = ScreenUtils.vpToPx(AppConstants.FLOAT_WINDOW_EXPANDED_WIDTH);
-    const pos = this.floatWindowManager.getWindowPosition();
-    // 缩回时窗口右移回原位
-    const newX = pos.x + (expandW - robotSizePx);
+    // 精确恢复到展开前的位置
     this.floatWindowManager.resizeWindow(robotSizePx, robotSizePx);
-    this.floatWindowManager.moveWindow(newX, pos.y);
+    this.floatWindowManager.moveWindow(this.preExpandPosition.x, this.preExpandPosition.y);
   }
 
   private showBubbleWithRemaining(msg: Message, remainingMs: number): void {
@@ -334,6 +331,9 @@ struct FloatWindowPage {
         return { x: center - AppConstants.BUBBLE_MAX_WIDTH - robotSize / 2, y: center - AppConstants.BUBBLE_MAX_HEIGHT / 2 };
     }
   }
+
+  // 气泡展开前的窗口位置，用于精确恢复
+  private preExpandPosition: Position = { x: 0, y: 0 };
 
   // 拖拽状态
   private isDragging: boolean = false;

@@ -7,6 +7,10 @@ export class DragManager {
   private floatWindowManager: FloatWindowManager;
   private dragStartPositionPx: Position = { x: 0, y: 0 };
   private isAnimating: boolean = false;
+  private lastMoveTime: number = 0;
+  private pendingX: number = 0;
+  private pendingY: number = 0;
+  private throttleTimer: number = -1;
 
   constructor() {
     this.floatWindowManager = FloatWindowManager.getInstance();
@@ -14,15 +18,29 @@ export class DragManager {
 
   onDragStart(): void {
     this.isAnimating = false;
+    this.lastMoveTime = 0;
     this.dragStartPositionPx = this.floatWindowManager.getWindowPosition();
   }
 
   onDragUpdate(offsetXVp: number, offsetYVp: number): void {
     const offsetXPx = ScreenUtils.vpToPx(offsetXVp);
     const offsetYPx = ScreenUtils.vpToPx(offsetYVp);
-    const newX = this.dragStartPositionPx.x + offsetXPx;
-    const newY = this.dragStartPositionPx.y + offsetYPx;
-    this.floatWindowManager.moveWindow(newX, newY);
+    this.pendingX = this.dragStartPositionPx.x + offsetXPx;
+    this.pendingY = this.dragStartPositionPx.y + offsetYPx;
+
+    const now = Date.now();
+    if (now - this.lastMoveTime >= 30) {
+      // 直接执行
+      this.lastMoveTime = now;
+      this.floatWindowManager.moveWindow(this.pendingX, this.pendingY);
+    } else if (this.throttleTimer === -1) {
+      // 延迟到下一个时间窗口执行
+      this.throttleTimer = setTimeout(() => {
+        this.throttleTimer = -1;
+        this.lastMoveTime = Date.now();
+        this.floatWindowManager.moveWindow(this.pendingX, this.pendingY);
+      }, 30 - (now - this.lastMoveTime));
+    }
   }
 
   calcSnapPosition(): Position {

@@ -1,7 +1,6 @@
 import { AbilityConstant, ConfigurationConstant, UIAbility, Want } from '@kit.AbilityKit';
 import { hilog } from '@kit.PerformanceAnalysisKit';
 import { window } from '@kit.ArkUI';
-import { router } from '@kit.ArkUI';
 import { PermissionHelper } from '../utils/PermissionHelper';
 import { FloatWindowManager } from '../managers/FloatWindowManager';
 import { ScreenUtils } from '../utils/ScreenUtils';
@@ -74,7 +73,16 @@ export default class EntryAbility extends UIAbility {
     hilog.info(0x0000, TAG, '>>> onNewWant');
     if (want.parameters && want.parameters['showMainPage'] === true) {
       this.hasUserTappedRobot = true;
-      router.pushUrl({ url: 'pages/MainPage' });
+      // 用 windowStage.loadContent 明确在主窗口加载，避免 router 误操作悬浮窗页面栈
+      if (this.windowStage) {
+        this.windowStage.loadContent('pages/MainPage', (err) => {
+          if (err && err.code) {
+            hilog.error(0x0000, TAG, '>>> loadContent MainPage FAILED: %{public}s', JSON.stringify(err));
+          } else {
+            hilog.info(0x0000, TAG, '>>> loadContent MainPage OK');
+          }
+        });
+      }
     }
   }
 

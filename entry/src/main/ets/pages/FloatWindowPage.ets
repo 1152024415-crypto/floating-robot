@@ -317,34 +317,30 @@ struct FloatWindowPage {
     )
     .onTouch((event: TouchEvent) => {
       const touch = event.touches[0];
+      const pos = this.floatWindowManager.getWindowPosition();
       if (event.type === TouchType.Down) {
-        // touch.x/y 是手指相对组件的位置（vp），记录为偏移量
         this.touchOffsetX = touch.x;
         this.touchOffsetY = touch.y;
         this.isDragging = false;
+        // 打印所有坐标，搞清楚坐标系
+        hilog.info(DOMAIN, TAG, 'DOWN x=%{public}f y=%{public}f screenX=%{public}f screenY=%{public}f winPos=(%{public}d,%{public}d)',
+          touch.x, touch.y, touch.screenX, touch.screenY, pos.x, pos.y);
       } else if (event.type === TouchType.Move) {
-        // touch.windowX/windowY 是手指相对窗口的位置
-        // touch.displayX/displayY 或 screenX/screenY 是屏幕绝对位置
-        // 方案：让窗口跟随手指，使手指始终在窗口内同一位置
-        // 窗口新位置 = 手指屏幕位置 - 手指在窗口内的偏移
-        const fingerScreenXPx = ScreenUtils.vpToPx(touch.screenX);
-        const fingerScreenYPx = ScreenUtils.vpToPx(touch.screenY);
-        const offsetPx = ScreenUtils.vpToPx(this.touchOffsetX);
-        const offsetPyPx = ScreenUtils.vpToPx(this.touchOffsetY);
-
         if (!this.isDragging) {
-          const pos = this.floatWindowManager.getWindowPosition();
-          const dx = fingerScreenXPx - offsetPx - pos.x;
-          const dy = fingerScreenYPx - offsetPyPx - pos.y;
-          if (Math.abs(dx) > ScreenUtils.vpToPx(5) || Math.abs(dy) > ScreenUtils.vpToPx(5)) {
+          const dx = touch.screenX - this.touchOffsetX;
+          const dy = touch.screenY - this.touchOffsetY;
+          if (Math.abs(dx) > 5 || Math.abs(dy) > 5) {
             this.isDragging = true;
             this.robotState = RobotState.DRAGGING;
+            hilog.info(DOMAIN, TAG, 'DRAG START');
           }
         }
         if (this.isDragging) {
+          hilog.info(DOMAIN, TAG, 'MOVE screenX=%{public}f screenY=%{public}f', touch.screenX, touch.screenY);
+          // 先试不转换，直接用 screenX 减偏移
           this.floatWindowManager.moveWindow(
-            fingerScreenXPx - offsetPx,
-            fingerScreenYPx - offsetPyPx
+            touch.screenX - this.touchOffsetX + pos.x,
+            touch.screenY - this.touchOffsetY + pos.y
           );
         }
       } else if (event.type === TouchType.Up) {

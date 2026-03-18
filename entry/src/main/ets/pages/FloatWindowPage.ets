@@ -293,9 +293,15 @@ struct FloatWindowPage {
     }
   }
 
+  // 拖拽状态（用 onTouch 实现，避免 PanGesture 在 TYPE_FLOAT 窗口中的坐标偏移问题）
+  private isDragging: boolean = false;
+  private touchStartScreenX: number = 0;
+  private touchStartScreenY: number = 0;
+  private windowStartX: number = 0;
+  private windowStartY: number = 0;
+
   build() {
     Stack({ alignContent: Alignment.Center }) {
-      // 机器人居中显示
       RobotView({ robotState: this.robotState })
     }
     .width(AppConstants.FLOAT_WINDOW_SIZE)
@@ -311,44 +317,43 @@ struct FloatWindowPage {
               this.onLongPress();
             }
           }),
-        PanGesture({ distance: AppConstants.PAN_DISTANCE_THRESHOLD })
-          .onActionStart(() => {
-            if (!this.isDeleteMode) {
-              this.handleDragStart();
-            }
-          })
-          .onActionUpdate((event: GestureEvent) => {
-            if (!this.isDeleteMode) {
-              this.onDragUpdate(event.offsetX, event.offsetY);
-            }
-          })
-          .onActionEnd(() => {
-            if (!this.isDeleteMode) {
-              this.handleDragEnd();
-            }
-          }),
         TapGesture()
           .onAction(() => {
-            if (!this.isDeleteMode) {
+            if (!this.isDeleteMode && !this.isDragging) {
               this.onTap();
             }
           })
       )
     )
     .onTouch((event: TouchEvent) => {
-      if (!this.isDeleteMode) {
-        return;
-      }
       const touch = event.touches[0];
-      if (event.type === TouchType.Move) {
-        this.onDeleteModeTouchMove(touch.screenX, touch.screenY);
-        const halfWindowPx = ScreenUtils.vpToPx(AppConstants.FLOAT_WINDOW_SIZE) / 2;
-        this.floatWindowManager.moveWindow(
-          ScreenUtils.vpToPx(touch.screenX) - halfWindowPx,
-          ScreenUtils.vpToPx(touch.screenY) - halfWindowPx
-        );
+      if (event.type === TouchType.Down) {
+        // 记录触摸起点和窗口起点（用屏幕绝对坐标）
+        this.touchStartScreenX = touch.screenX;
+        this.touchStartScreenY = touch.screenY;
+        const pos = this.floatWindowManager.getWindowPosition();
+        this.windowStartX = pos.x;
+        this.windowStartY = pos.y;
+        this.isDragging = false;
+      } else if (event.type === TouchType.Move) {
+        const dx = touch.screenX - this.touchStartScreenX;
+        const dy = touch.screenY - this.touchStartScreenY;
+        // 超过阈值才算拖拽
+        if (!this.isDragging && (Math.abs(dx) > 5 || Math.abs(dy) > 5)) {
+          this.isDragging = true;
+          this.robotState = RobotState.DRAGGING;
+        }
+        if (this.isDragging) {
+          // screenX/screenY 是 vp，moveWindowTo 接受 px
+          const newX = this.windowStartX + ScreenUtils.vpToPx(dx);
+          const newY = this.windowStartY + ScreenUtils.vpToPx(dy);
+          this.floatWindowManager.moveWindow(newX, newY);
+        }
       } else if (event.type === TouchType.Up) {
-        this.onDeleteModeTouchEnd(touch.screenY);
+        if (this.isDragging) {
+          this.isDragging = false;
+          this.handleDragEnd();
+        }
       }
     })
   }

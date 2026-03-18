@@ -154,15 +154,12 @@ export class FloatWindowManager {
     });
   }
 
-  async moveWindow(xPx: number, yPx: number): Promise<void> {
+  moveWindow(xPx: number, yPx: number): void {
     if (!this.windowInstance || this.state !== FloatWindowState.VISIBLE) {
       return;
     }
-    try {
-      await this.windowInstance.moveWindowTo(xPx, yPx);
-      this.currentPositionPx = { x: xPx, y: yPx };
-    } catch (err) {
-      hilog.error(DOMAIN, TAG, 'Move window failed: %{public}s', JSON.stringify(err));
-    }
+    // fire-and-forget，不 await，避免拖拽卡顿
+    this.windowInstance.moveWindowTo(xPx, yPx);
+    this.currentPositionPx = { x: xPx, y: yPx };
   }
 }

@@ -27,10 +27,10 @@ export class MessageService {
     this.timerId = setInterval(() => {
       this.generateMockMessage();
     }, AppConstants.MOCK_MESSAGE_INTERVAL);
-    // 启动后5s发送第一条，方便测试
+    // 启动后1s发送第一条，方便测试
     setTimeout(() => {
       this.generateMockMessage();
-    }, 5000);
+    }, 1000);
   }
 
   stopMockMessages(): void {

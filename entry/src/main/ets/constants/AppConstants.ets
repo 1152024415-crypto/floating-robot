@@ -20,5 +20,5 @@ export class AppConstants {
   static readonly PAN_DISTANCE_THRESHOLD: number = 5; // vp
   static readonly TAP_DEBOUNCE: number = 300; // ms
   // 打桩
-  static readonly MOCK_MESSAGE_INTERVAL: number = 30000; // ms
+  static readonly MOCK_MESSAGE_INTERVAL: number = 15000; // ms
 }

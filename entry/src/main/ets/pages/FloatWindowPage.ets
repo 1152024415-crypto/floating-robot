@@ -39,7 +39,9 @@ struct FloatWindowPage {
   @State currentEdge: EdgePosition = EdgePosition.RIGHT;
 
   aboutToAppear(): void {
+    hilog.info(DOMAIN, TAG, 'aboutToAppear called');
     this.messageService.onNewMessage = (msg: Message) => {
+      hilog.info(DOMAIN, TAG, 'onNewMessage callback: %{public}s', msg.content);
       this.handleNewMessage(msg);
     };
     this.messageService.startMockMessages();
@@ -53,12 +55,15 @@ struct FloatWindowPage {
   // ===== 消息处理 =====
 
   private handleNewMessage(msg: Message): void {
+    hilog.info(DOMAIN, TAG, 'handleNewMessage: deleteMode=%{public}s bubbleVisible=%{public}s',
+      this.isDeleteMode.toString(), this.isBubbleVisible.toString());
     if (this.isDeleteMode) {
       return;
     }
     if (this.isBubbleVisible) {
       return;
     }
+    hilog.info(DOMAIN, TAG, 'showBubble: %{public}s', msg.content);
     this.showBubble(msg);
   }
 

@@ -62,9 +62,10 @@ export class FloatWindowManager {
       await this.windowInstance.resize(sizePx, sizePx);
       hilog.info(DOMAIN, TAG, '[create] resized to %{public}d', sizePx);
 
-      // 初始位置：右下角
+      // 初始位置：右侧偏上（避免挡住底部 app 图标，上移约 2 个 app 图标高度）
       const initX = ScreenUtils.getScreenWidthPx() - sizePx;
-      const initY = ScreenUtils.getScreenHeightPx() - sizePx;
+      const appIconOffset = ScreenUtils.vpToPx(160);
+      const initY = ScreenUtils.getScreenHeightPx() - sizePx - appIconOffset;
       await this.windowInstance.moveWindowTo(initX, initY);
       this.currentPositionPx = { x: initX, y: initY };
       hilog.info(DOMAIN, TAG, '[create] moved to (%{public}d,%{public}d)', initX, initY);

@@ -24,12 +24,19 @@ export struct MessageBubble {
   build() {
     if (this.isVisible && this.message) {
       Column() {
-        // 顶部：关闭按钮
+        // 消息内容 + X 关闭按钮在同一行
         Row() {
-          Blank()
+          Text(this.message.content)
+            .fontSize(13)
+            .fontColor('#333333')
+            .maxLines(2)
+            .textOverflow({ overflow: TextOverflow.Ellipsis })
+            .layoutWeight(1)
+
           Text('x')
-            .fontSize(14)
+            .fontSize(13)
             .fontColor('#999999')
+            .margin({ left: 6 })
             .onClick(() => {
               if (this.onClose) {
                 this.onClose();
@@ -37,15 +44,7 @@ export struct MessageBubble {
             })
         }
         .width('100%')
-        .padding({ right: 8, top: 4 })
-
-        // 消息内容
-        Text(this.message.content)
-          .fontSize(13)
-          .fontColor('#333333')
-          .maxLines(2)
-          .textOverflow({ overflow: TextOverflow.Ellipsis })
-          .padding({ left: 10, right: 10, bottom: 6 })
+        .padding({ left: 10, right: 8, top: 8, bottom: 6 })
 
         // 反馈栏
         Row({ space: 16 }) {
